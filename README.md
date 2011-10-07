@@ -2,12 +2,23 @@ Bullet
 ======
 
 Parallel load-testing, fast like a bullet.
+Bullet specifically target at Heroku-deploy Cedar environment.
 Bullet use Parallel internally to manage threads and run mechanize/webrat tasks
 that load-test your website.
 
+How to use the command
+======================
 
-How to use
-==========
+`bullet` will look for a `bullet.yml` in the current directory, use `github`
+plan (details explained in .yml structure), use 10 rambos (dynos). Each dyno
+will spawn 10 processes/threads, and take specs from `spec/performance`
+
+```
+bullet --aim github --with-rambo 10 --use-guns 10 spec/performance
+```
+
+How to use in Ruby
+==================
 
 By default, Bullet will look for .rb files inside `guns` folder in the current
 directory. You can specify the folder with `load`
@@ -17,10 +28,26 @@ Once all bullets are ready, you can `fire` it
 ```ruby
 require 'bullet'
 
-Bullet(:use => 10, :with => :thread).load('specs/*.rb').fire
+Bullet(:rambo => 10, :gun => 10, :with => :thread).load('bullet.yml')
+  .use("spec/performance").aim('github').fire
 ```
 
-Contributing to bullet
+Config template
+===============
+github:
+  user:
+    register: 10
+    create_repo: 100
+
+This will use `user/register_spec.rb` and `user/create_repo_spec.rb` from
+specified folder i.e `spec/performance`
+
+
+Contributors
+============
+Daniel, Dao Quang Minh (dqminh89@gmail.com)
+
+Contributing to Bullet
 ======================
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
