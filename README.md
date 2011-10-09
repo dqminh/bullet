@@ -6,8 +6,8 @@ Bullet specifically target at Heroku-deploy Cedar environment.
 Bullet use Parallel internally to manage threads and run mechanize/webrat tasks
 that load-test your website.
 
-How to use the command
-======================
+How to use the command (not ready)
+==================================
 
 `bullet` will look for a `bullet.yml` in the current directory, use `github`
 plan (details explained in .yml structure), use 10 rambos (dynos). Each dyno
@@ -28,16 +28,17 @@ Once all bullets are ready, you can `fire` it
 ```ruby
 require 'bullet'
 
-Bullet(:machine => 10, :gun => 10).load('bullet.yml')
-  .use("spec/performance").aim('github').fire
+Bullet(:machine => 10, :gun => 10).load('bullet.yml').use("spec/performance").aim('github').fire
 ```
 
 Config template
 ===============
+```
 github:
   user:
     register: 10
     create_repo: 100
+```
 
 This will use `user/register_spec.rb` and `user/create_repo_spec.rb` from
 specified folder i.e `spec/performance`
