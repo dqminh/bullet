@@ -57,7 +57,7 @@ describe Bullet::BulletClient do
   
   describe :aim do
     it "choose target as the plan" do
-      subject.use("plan")
+      subject.aim("plan")
       subject.plan.should == "plan"
     end
   end
@@ -88,9 +88,9 @@ describe Bullet::BulletClient do
   end
 
   describe :use do
-    it "accepts the plan" do
+    it "accept the path as look up path" do
       subject.use("hello")
-      subject.plan.should == "hello"
+      subject.spec_path.should == "hello"
     end
   end
 
