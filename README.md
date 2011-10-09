@@ -28,7 +28,7 @@ Once all bullets are ready, you can `fire` it
 ```ruby
 require 'bullet'
 
-Bullet(:machine => 10, :gun => 10, :with => :threads).load('bullet.yml')
+Bullet(:machine => 10, :gun => 10).load('bullet.yml')
   .use("spec/performance").aim('github').fire
 ```
 

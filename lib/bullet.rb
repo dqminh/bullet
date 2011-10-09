@@ -4,7 +4,7 @@ module Bullet
   class InvalidPlanError < Exception
   end
   class BulletClient
-    attr_accessor :machines, :with, :specs, :plan_list, :plan, :guns
+    attr_accessor :machines, :specs, :plan_list, :plan, :guns
 
     def initialize(options={})
       self.options = options
@@ -13,12 +13,10 @@ module Bullet
 
     def options=(options)
       options[:machines] ||= 2
-      options[:with] ||= :thread
       options[:gun] ||= 2
       @options = options
       @guns = options[:gun]
       @machines = @options[:machines]
-      @with = @options[:with]
     end
 
     def unload
@@ -91,6 +89,7 @@ module Bullet
     end
 
     def execute(specs)
+      puts specs
     end
   end
 end
