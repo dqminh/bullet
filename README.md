@@ -2,7 +2,9 @@ Bullet
 ======
 
 Parallel load-testing, fast like a bullet.
+
 Bullet specifically target at Heroku-deploy Cedar environment.
+
 Bullet use Parallel internally to manage threads and run mechanize/webrat tasks
 that load-test your website.
 
