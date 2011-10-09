@@ -1,0 +1,5 @@
+github:
+  user:
+    register: 10
+  admin:
+    create_user: 20

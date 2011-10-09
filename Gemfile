@@ -1,12 +1,10 @@
 source "http://rubygems.org"
 
-gem "nokogiri"
-gem "mechanize"
-gem "webrat"
+gem "heroku"
+gem "rspec"
 gem "parallel"
 
 group :development do
-  gem "rspec"
   gem "bundler"
   gem "jeweler"
   gem "rcov"

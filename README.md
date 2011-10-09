@@ -14,7 +14,7 @@ plan (details explained in .yml structure), use 10 rambos (dynos). Each dyno
 will spawn 10 processes/threads, and take specs from `spec/performance`
 
 ```
-bullet --aim github --with-rambo 10 --use-guns 10 spec/performance
+bullet --aim github --machine 10 --gun 10 spec/performance
 ```
 
 How to use in Ruby
@@ -28,7 +28,7 @@ Once all bullets are ready, you can `fire` it
 ```ruby
 require 'bullet'
 
-Bullet(:rambo => 10, :gun => 10, :with => :thread).load('bullet.yml')
+Bullet(:machine => 10, :gun => 10, :with => :threads).load('bullet.yml')
   .use("spec/performance").aim('github').fire
 ```
 

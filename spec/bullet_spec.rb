@@ -1,79 +1,108 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require "yaml"
 
 shared_examples "a bullet" do
-  let(:process) { "in_#{bullet_type}".to_sym }
+  let(:capacity) { 2 }
+
   subject do
-    described_class.new(:use => capacity, :with => bullet_type)
+    described_class.new(:machines => machines, :guns => capacity)
   end
 
   describe :fire do
     it "spawns correct number of threads" do
       bullets = ["first", "second"]
-      subject.magazine = bullets
-      Parallel.expects(:map).with(bullets, process => capacity)
+      subject.specs = bullets
+      Parallel.expects(:map).with(bullets, :in_threads => capacity)
       subject.fire
     end
 
-    #it "triggers :before_all" do
-      #bullets = ["first", "second"]
-      #mock.expects(["first", "second"])
-      #subject.before_all_hooks = [mock]
-      #subject.fire
-    #end
+    it "executes loaded specs" do
+      bullets = ["first", "second"]
+      subject.specs = bullets
+      Bullet::BulletClient.any_instance.stubs(:execute).returns("hello")
+      subject.fire.should == ["hello"] * bullets.length
+    end
 
-    #it "triggers :after_all" do
-      #bullets = ["first", "second"]
-      #mock = double("after_all")
-      #mock.should_receive(["first", "second"])
-      #subject.after_all_hooks = [mock]
-      #subject.fire
-    #end
-
-    it "executes loaded bullets" do
+    it "unloads after fire" do
+      bullets = ["first", "second"]
+      subject.specs = bullets
+      Bullet::BulletClient.any_instance.stubs(:execute).returns(true)
+      subject.fire
+      subject.specs.should have(0).bullets
     end
   end
 end
 
-describe Bullet do
-  subject { Bullet.new() }
+describe Bullet::BulletClient do
+  subject { Bullet::BulletClient.new() }
 
   describe :unload do
-    it "drops all collected bullets" do
-      subject.magazine = ["test"]
+    it "drops all collected specs and plan_list" do
+      subject.plan_list = {"hello" => 1}
+      subject.specs = ["test"]
       subject.unload
-      subject.magazine.should have(0).bullet
+      subject.specs.should have(0).spec
     end
   end
 
   describe :load do
-    it "collect bullets" do
-      subject.load("dummy/*.rb")
-      num_bullets = Dir.entries("dummy").length - 2
-      subject.magazine.should have(num_bullets).bullet
+    it "collect plans" do
+      subject.load("dummy_bullet.yml")
+      subject.plan_list.should eq({"github" => {
+        "user" => {"register" => 10},
+        "admin" => {"create_user" => 20}
+      }})
+    end
+  end
+  
+  describe :aim do
+    it "choose target as the plan" do
+      subject.use("plan")
+      subject.plan.should == "plan"
+    end
+  end
+
+  describe :prepare do
+    it "calculates path to specs" do
+      subject.plan_list = {"normal" => {"user" => {"signin" => 1, "register" => 2}}}
+      subject.plan = "normal"
+      expected = ["user_signin", "user_register", "user_register"]
+      subject.prepare
+      (subject.specs.flatten - expected).should be_empty
     end
 
-    it "respects dir pattern" do
-      subject.load("dummy/simple*.rb")
-      subject.magazine.should have(1).bullet
+    it "distribute specs to machines" do
+      subject.plan_list = {"normal" => {"user" => {"signin" => 1, "register" => 2}}}
+      subject.plan = "normal"
+      subject.machines = 2
+      subject.prepare
+      subject.specs.should have(2).sets
     end
+  end
 
-    it "accepts list of patterns" do
-      subject.load(["dummy/simple.rb", "dummy/complex.rb"])
-      subject.magazine.should have(2).bullet
+  describe :ready? do
+    it "verifies that specs exists" do
+      subject.specs = [["hello"]]
+      subject.ready?.should be_true
+    end
+  end
+
+  describe :use do
+    it "accepts the plan" do
+      subject.use("hello")
+      subject.plan.should == "hello"
     end
   end
 
   context "with threads" do
     it_behaves_like "a bullet" do
-      let(:bullet_type) { :threads }
-      let(:capacity) { 2 }
+      let(:machines) { 2 }
     end
   end
 
   context "with processes" do
     it_behaves_like "a bullet" do
-      let(:bullet_type) { :processes }
-      let(:capacity) { 2 }
+      let(:machines) { 2 }
     end
   end
 end
